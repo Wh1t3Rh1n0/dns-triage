@@ -32,6 +32,9 @@ See also
 Changelog
 ---------
 
+- **2023-11-01**
+    - Corrected the ProofPoint securemail registration URL.
+
 - **2023-10-31: Happy Halloween! 🎃**
 	- Public release on GitHub.
 	- Added check for ADP payroll URL. 

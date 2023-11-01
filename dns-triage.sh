@@ -73,6 +73,10 @@ check-type() {
     fi
 }
 
+
+# Check if a domain or subdomain exists.
+# If found, print a description and optional URLs generated from the domain name.
+# Usage: check-domain <Domain/Subdomain> <Description> [Optional URL paths (up to 7)]
 check-domain() {
     rm -f $TEMPFILE 2>/dev/null >/dev/null
     dig $1 $DNS_SRV | grep -vE '^$|^;' | grep -vE "IN$(echo -e '\t')SOA" > $TEMPFILE
@@ -92,6 +96,15 @@ check-domain() {
         fi
         if [ "$6" != "" ] ; then
             echo "  - https://$1$6"
+        fi
+        if [ "$7" != "" ] ; then
+            echo "  - https://$1$7"
+        fi
+        if [ "$8" != "" ] ; then
+            echo "  - https://$1$8"
+        fi
+        if [ "$9" != "" ] ; then
+            echo "  - https://$1$9"
         fi
         echo "------------------------------------------------------------------------------"
         cat $TEMPFILE
@@ -224,7 +237,11 @@ rm -f $TEMPFILE 2>/dev/null >/dev/null
 check-domain autodiscover.$TARGET_SLD "-- May be on-prem Exchange/OWA if not a Microsoft-owned IP" "/" "/autodiscover/autodiscover.xml" "/owa/" "/EWS/Exchange.asmx"
 check-domain lyncdiscover.$TARGET_SLD "-- May be on-prem Lync/Skype For Business if not a Microsoft-owned IP" "/  (Check XML for references to other URLs/servers)" "/scheduler/  (Also try this URL on other servers found in XML)" "/dialin/  (Also try this URL on other servers found in XML)"
 check-domain activesync.$TARGET_SLD "-- May be on-prem ActiveSync if not a Microsoft-owned IP" "/" "/Microsoft-Server-ActiveSync"
-check-domain securemail.$TARGET_SLD "-- Possible Secure Mail app" "/" "/securereader/registration.jsf  (ProofPoint Encrypted Mail user registration)" "/s/preregister  (Zix Secure Message Center user registration)"
+
+# check-domain securemail.$TARGET_SLD "-- Possible Secure Mail app" "/" "/encrypt  (ProofPoint Encrypted Mail user registration)" "/securereader/init.jsf  (ProofPoint Encrypted Mail user registration step 2)" "/securereader/registration.jsf  (ProofPoint Encrypted Mail user registration step 3)" "/s/preregister  (Zix Secure Message Center user registration)"
+
+check-domain securemail.$TARGET_SLD "-- Possible Secure Mail app" "/" "/encrypt  (ProofPoint Encrypted Mail user registration)" "/s/preregister  (Zix Secure Message Center user registration)"
+
 check-domain fs.$TARGET_SLD "-- Possible ADFS portal" "/adfs/ls/idpinitiatedsignon.htm"
 check-domain adfs.$TARGET_SLD "-- Possible ADFS portal" "/adfs/ls/idpinitiatedsignon.htm"
 check-domain mail.$TARGET_SLD "-- Check if different from MX. May be legacy/spoofable/OWA." "/" "/autodiscover/autodiscover.xml" "/owa/" "/EWS/Exchange.asmx"
