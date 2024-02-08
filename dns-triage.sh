@@ -69,6 +69,13 @@ check-type() {
         echo "------------------------------------------------------------------------------"
         cat $TEMPFILE
         echo
+        
+        if [ "$1" == mx ] && [ "$(grep -i 'pphosted.com' $TEMPFILE | head -n1 )" != "" ] ; then
+            echo "[*] Proofpoint detected - Try entering the numeric ID in the subdomain here:"
+            echo "    - https://app.explore.proofpoint.com/v2/apps/login/?usercenter=false"
+            echo
+        fi
+        
         rm -f $TEMPFILE 2>/dev/null >/dev/null
     fi
 }
@@ -296,6 +303,7 @@ check-okta $TARGET_SLD
 
 check-thirdparty-simple "ServiceNow" service-now.com $TARGET_SLD
 check-thirdparty-simple "SalesForce" salesforce.com $TARGET_SLD
+check-thirdparty-simple "SalesForce" my.salesforce.com $TARGET_SLD
 check-thirdparty-simple 'Zoom vanity URL' zoom.us $TARGET_SLD
 check-thirdparty-simple 'Zoom vanity URL' zoom.com $TARGET_SLD
 

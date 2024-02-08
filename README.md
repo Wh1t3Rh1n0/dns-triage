@@ -32,6 +32,10 @@ See also
 Changelog
 ---------
 
+- **2024-02-01**
+    - Added .my.salesforce.com additional detection for Salesforce.
+    - Added Organization Account Alias/ID URL for Proofpoint.
+
 - **2023-11-01**
     - Corrected the ProofPoint securemail registration URL.
 
