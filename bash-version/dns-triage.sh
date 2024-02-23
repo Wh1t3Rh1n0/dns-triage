@@ -54,6 +54,16 @@ grep-txt() {
     fi
 }
 
+# Check if the target DNS record points to a Microsoft-owned domain.
+is-microsoft() {
+    TARGET=$1
+    if [ "$(dig +short lyncdiscover.wayfair.com | grep -Ei '\.(office|outlook|lync)\.com\.?$' | tr -d '\r' | tr -d '\n')" != "" ] ; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
 
 check-type() {
     rm -f $TEMPFILE >/dev/null 2>/dev/null
@@ -211,9 +221,6 @@ check-redirect() {
         echo    
     fi
 }
-
-
-
 
 
 

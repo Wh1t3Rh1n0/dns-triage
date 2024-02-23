@@ -1,7 +1,12 @@
-dns-triage
-==========
+dns-triage.py
+=============
 
-A simple bash script to check default and *really* common DNS records to quickly identify external services and other interesting things about your target.
+A simple Python script to do quick, targeted recon of a given domain.
+
+Checks:
+- DNS records
+- *Selected* subdomains - chosen for high value and frequency
+- Third-party services
 
 Usage
 -----
@@ -16,9 +21,95 @@ Example:
 bash dns-triage.sh example.com
 ```
 
-Sample output:
 
-![example-output.png](example-output.png)
+Sample output
+-------------
+
+*Note: Real domain names and IP addresses have been replaced with example.com and 127.0.0.1 in the sample output.*
+
+```
+================================================================================
+Gathering DNS records for parent domain, example.com...
+================================================================================
+
+A records for example.com
+-------------------------
+127.0.0.1
+
+NS records for example.com
+--------------------------
+ns1.domaincontrol.com.
+ns2.domaincontrol.com.
+
+MX records for example.com
+--------------------------
+10 mxa-00000000.gslb.pphosted.com.
+10 mxb-00000000.gslb.pphosted.com.
+
+[!] ProofPoint detected as default incoming email service.
+    Numeric ID from the subdomain name may be used here:
+    - https://app.explore.proofpoint.com/v2/apps/login/?usercenter=false
+
+
+================================================================================
+Checking subdomains of example.com...
+================================================================================
+
+Checking for wildcard subdomain records...
+------------------------------------------
+[+] No wildcard DNS records found. Output should be pretty reliable.
+
+Checking for Microsoft Exchange Smart Hosts...
+----------------------------------------------
+[+] example-com.mail.protection.outlook.com > 127.0.0.1
+    [💥]  Microsoft Exchange Online smart host detected!
+        - May allow email spoofing. See:
+          https://www.blackhillsinfosec.com/spoofing-microsoft-365-like-its-1995/
+
+Checking for Microsoft Services...
+----------------------------------
+[💥] autodiscover.example.com > email.example.com.
+[💥] POSSIBLE ON-PREMISES SERVICE: Microsoft Exchange/OWA
+    Recommend investigating these URLs:
+    - https://autodiscover.example.com/
+    - https://autodiscover.example.com/autodiscover/autodiscover.xml
+    - https://autodiscover.example.com/owa/
+    - https://autodiscover.example.com/EWS/Exchange.asmx
+
+Checking for common subdomains...
+---------------------------------
+[+] securemail.example.com > 127.0.0.1
+    Possible Secure Mail app. Try:
+    - https://securemail.example.com/
+    - https://securemail.example.com/encrypt  (ProofPoint Encrypted Mail user registration)
+    - https://securemail.example.com/s/preregister  (Zix Secure Message Center user registration)
+
+[+] vdi.example.com > vdi-portal.example.com.
+    Possible VPN/remote access.
+
+
+================================================================================
+Checking third-party services of "example"...
+================================================================================
+
+[+] example.service-now.com - ServiceNow likely in use!
+
+[+] example.zoom.us - Zoom likely in use!
+
+[+] example.zoom.com - Zoom likely in use!
+
+[+] example.webex.com - Webex likely in use!
+    - Try browsing to this subdomain, and look in Web UI for calendar/meetings.
+    - Try Google-dorking this domain to find links to meetings.
+
+[+] https://example.slack.com - Slack likely in use!
+
+[+] https://example.atlassian.net - Atlassian (Jira/Confluence/Trello) likely in use!
+    - https://example.atlassian.net/login.jsp
+
+
+DONE!
+```
 
 
 See also
@@ -31,6 +122,9 @@ See also
 
 Changelog
 ---------
+
+- **2024-02-23**
+	- Rewrote `dns-triage` in Python as `dns-triage.py`. ***The Python version will replace the Bash version, moving forward.***
 
 - **2024-02-01**
     - Added .my.salesforce.com additional detection for Salesforce.
