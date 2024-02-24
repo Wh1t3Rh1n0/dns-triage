@@ -465,7 +465,7 @@ subdomain_targets = {
     'signon.{target}': [],
     }
 
-print_heading("Checking for common subdomains...")
+print_heading("Checking for interesting subdomains...")
 
 check_dns_record_exists(f'securemail-{target}', securemail_info)
 
