@@ -130,7 +130,7 @@ def is_microsoft_hosted(result):
     """
 
     if result:
-        if re_search_list('.*\.(outlook|office|lync|microsoftonline)\.com\.?$', result):
+        if re_search_list(r'.*\.(outlook|office|lync|microsoftonline)\.com\.?$', result):
             return True
         else:
             return False
@@ -202,7 +202,7 @@ def is_okta_hosted(result):
     """Return True of the given DNS lookup result resolves to Okta.com."""
 
     if result:
-        if re_search_list('.*\.(okta.com)\.?$', result):
+        if re_search_list(r'.*\.(okta.com)\.?$', result):
             return True
         else:
             return False
@@ -356,7 +356,7 @@ mx_records = check_type(target, 'MX')
 
 # Check MX records to determine if ProofPoint is in use.
 if mx_records:
-    r = re.compile('.*\.pphosted\.com\.?$', re.IGNORECASE)
+    r = re.compile(r'.*\.pphosted\.com\.?$', re.IGNORECASE)
     newlist = list(filter(r.match, mx_records))
     if ( len(newlist) > 0):
         print()
