@@ -16,7 +16,10 @@ Quick, targeted recon of a given domain. Checks:
 - Selected subdomains - chosen for high value and frequency
 - Third-party services
 
-Usage: python3 dns-triage.py <Target Domain> [Optional Nameserver]
+Recommended: Provide the Microsoft tenant name (___.onmicrosoft.com) if it is
+known. Otherwise, the script will attempt to guess.
+
+Usage: python3 dns-triage.py <Domain> [Nameserver] [Microsoft Tenant]
 """
 
 
@@ -28,8 +31,11 @@ if len(sys.argv) < 2 or "-h" in sys.argv or '--help' in sys.argv:
 target = sys.argv[1]
 orgname = target.split('.')[0]
 
-if len(sys.argv) > 2: dns_resolver = sys.argv[2]
-else: dns_resolver = False
+#if len(sys.argv) > 2: dns_resolver = sys.argv[2]
+#else: dns_resolver = False
+
+#if len(sys.argv) > 3: ms_tenant = sys.argv[3]
+#else: ms_tenant = None
 
 
 def resolve(target, record_type=None):
@@ -116,7 +122,7 @@ def re_search_list(regex, target_list):
         r = re.compile(regex, re.IGNORECASE)
         newlist = list(filter(r.match, target_list))
         if ( len(newlist) > 0):
-            return True
+            return newlist
         else:
             return False
     else:
@@ -136,7 +142,8 @@ def is_microsoft_hosted(result):
             return False
 
 
-def check_dns_record_exists(fqdn, info_list, check_if_ms_hosted=False):
+def check_dns_record_exists(fqdn, info_list, check_if_ms_hosted=False, 
+                            wildcard_result=None, target=target):
     """
     Check if a DNS record resolves successfully. If it does, display
     the lines in info_list.
@@ -149,6 +156,16 @@ def check_dns_record_exists(fqdn, info_list, check_if_ms_hosted=False):
     else: info_sublist = None
 
     result = resolve_host_record(fqdn)
+    
+    #print("Result: ")
+    #print(result)
+    #print("Wildcard: ")
+    #print(wildcard_result)
+    
+    if result == wildcard_result and wildcard_result != None:
+        #print("[!] Probable false positive - wildcard subdomain record match.")
+        return
+    
     if result:
 
         # Handle on-premises Microsoft services
@@ -167,6 +184,10 @@ def check_dns_record_exists(fqdn, info_list, check_if_ms_hosted=False):
             print('[+] ' + fqdn + ' > ' + result[0])
             for line in info_list:
                 print('    ' + line)
+
+        # Handle Okta portals.
+        if result and target.lower() != 'okta.com' and is_okta_hosted(result):
+            print("    [!] Okta login portal detected")
 
         print()
         return result
@@ -198,7 +219,7 @@ def convert_to_smarthost_list(domain):
     return smarthost_variants
 
 
-def is_okta_hosted(result):
+def is_okta_hosted(result, target=target):
     """Return True of the given DNS lookup result resolves to Okta.com."""
 
     if result:
@@ -338,6 +359,15 @@ def check_thirdparty_by_http_status(url_template, info_list, orgname=orgname):
         print()
 
 
+# Parse additional command arguments.
+dns_resolver = re_search_list(r'([0-9]{1,3}\.){3}[0-9]{1,3}', sys.argv)
+if dns_resolver: dns_resolver = dns_resolver[0]
+ms_tenant = re_search_list(r'.*\.onmicrosoft\.com', sys.argv)
+if ms_tenant: ms_tenant = ms_tenant[0]
+
+
+if dns_resolver:
+    print(f"Using user-defined nameserver: {dns_resolver}")
 
 print_heading(f"Gathering DNS records for parent domain, {target}...", False,
               '=', width=80, top_line=True)
@@ -365,28 +395,37 @@ if mx_records:
         print("    - https://app.explore.proofpoint.com/v2/apps/login/?usercenter=false")
 
 
-# Beginning of subdomain checks.
+# Check for smart hosts.
 print()
-print_heading(f"Checking subdomains of {target}...", False, '=', width=80,
+print_heading(f"Checking for Microsoft Exchange Smart Hosts...", False, '=', width=80,
               top_line=True)
-
-print_heading("Checking for wildcard subdomain records...")
-wildcard_test = ( "WILDCARD-LITERALLY-ANYTHING-" + randomword(8) + "." + target )
-if ( resolve(wildcard_test,'A') or resolve(wildcard_test,'AAAA') or
-     resolve(wildcard_test,'CNAME') ):
-     print("[⚠️] WARNING: Wildcard subdomains found. Subdomain results may be less reliable.")
+if ms_tenant:
+    smarthost_variants = [ ms_tenant.lower().replace('.onmicrosoft.com','') + 
+                           '.mail.protection.outlook.com' ]
 else:
-    print("[+] No wildcard DNS records found. Output should be pretty reliable.")
-
-
-print_heading("Checking for Microsoft Exchange Smart Hosts...")
-smarthost_variants = convert_to_smarthost_list(target)
+    smarthost_variants = convert_to_smarthost_list(target)
 smarthost_info = ['[💥]  Microsoft Exchange Online smart host detected!',
                   '    - May allow email spoofing. See:',
                   '      https://www.blackhillsinfosec.com/spoofing-microsoft-365-like-its-1995/',
                  ]
 for smarthost in smarthost_variants:
     check_dns_record_exists(smarthost, smarthost_info)
+
+
+# Beginning of subdomain checks.
+#print()
+print_heading(f"Checking subdomains of {target}...", False, '=', width=80,
+              top_line=True)
+
+print_heading("Checking for wildcard subdomain records...")
+wildcard_subdomain = "WILDCARD-LITERALLY-ANYTHING-" + randomword(8) + "." + target
+wildcard_info = ["[⚠️] WARNING: Wildcard subdomains found. Deploying countermeasures... 🦏", 
+                 "     - Only displaying subdomains that resolve to a different value than the",
+                 "       wildcard record.", ]
+wildcard_result = check_dns_record_exists(wildcard_subdomain, wildcard_info)
+if not wildcard_result:
+    print("[+] No wildcard DNS records found. Output should be pretty reliable.")
+
 
 
 exchange_urls = [ "- https://{fqdn}/",
@@ -417,7 +456,10 @@ for subdomain in ms_subdomain_targets.keys():
     fqdn = subdomain.format(**{'target': target})
     values={'fqdn': fqdn, 'subdomain': subdomain, 'target': target}
     subdomain_info = [line.format(**values) for line in ms_subdomain_targets[subdomain]]
-    subdomain_exists = check_dns_record_exists(fqdn, subdomain_info, check_if_ms_hosted=True)
+    subdomain_exists = check_dns_record_exists(fqdn, subdomain_info,
+                                               check_if_ms_hosted=True,
+                                               wildcard_result=wildcard_result)
+
 
 
 adfs_info = [ 'Possible ADFS portal',
@@ -460,7 +502,7 @@ subdomain_targets = {
     'directory.{target}': [],
     'sso.{target}': [],
     'login.{target}': [],
-    'okta.{target}': [],
+    'okta.{target}': ['Possible Okta portal.'],
     'signin.{target}': [],
     'signon.{target}': [],
     }
@@ -473,18 +515,24 @@ for subdomain in subdomain_targets.keys():
     fqdn = subdomain.format(**{'target': target})
     values={'fqdn': fqdn, 'subdomain': subdomain, 'target': target}
     subdomain_info = [line.format(**values) for line in subdomain_targets[subdomain]]
-    result = check_dns_record_exists(fqdn, subdomain_info)
-    if result and is_okta_hosted(result):
+    result = check_dns_record_exists(fqdn, subdomain_info, 
+                                     wildcard_result=wildcard_result)
+    if result and target.lower() != 'okta.com' and is_okta_hosted(result):
         print("    [!] Okta login portal detected")
+        print()
 
+
+zoom_info_list = [ 'Zoom',
+                   '- Try Google-dorking this domain to find links to meetings.',
+                 ]
 
 thirdparty_by_dns_comparison = {
     '{orgname}.okta.com': ["Okta"],
     '{orgname}.service-now.com': ["ServiceNow"],
     '{orgname}.salesforce.com': ['SalesForce'],
     '{orgname}.my.salesforce.com': ['SalesForce'],
-    '{orgname}.zoom.us': ['Zoom'],
-    '{orgname}.zoom.com': ['Zoom'],
+    '{orgname}.zoom.us': zoom_info_list,
+    '{orgname}.zoom.com': zoom_info_list,
     '{orgname}.saasit.com': ['Ivanti'],
     '{orgname}.webex.com': ['Webex',
                             '- Try browsing to this subdomain, and look in Web UI for calendar/meetings.',
