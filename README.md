@@ -12,13 +12,13 @@ Usage
 -----
 
 ```bash
-bash dns-triage.sh <Second-Level Domain> [Optional DNS Server]
+python3 dns-triage.py <Second-Level Domain> [Optional DNS Server] [Optional Microsoft Tenant]
 ```
 
 Example: 
 
 ```
-bash dns-triage.sh example.com
+python3 dns-triage.py example.com
 ```
 
 
@@ -123,6 +123,21 @@ See also
 Changelog
 ---------
 
+- **2024-03-10**
+	- Fixed old bash reference in README.md.
+	- Updated random string generation to match length of target and orgname strings.
+	- Added Workday.
+
+- **2024-03-08**
+    - Added GitHub.
+    - Added Discord.
+
+- **2024-03-05**
+    - Added Perks at Work.
+
+- **2024-03-04**
+	- Added common subdomains and info for Azure Multi-Factor Authentication Server.
+
 - **2024-02-23**
 	- Rewrote `dns-triage` in Python as `dns-triage.py`. ***The Python version will replace the Bash version, moving forward.***
 
@@ -146,23 +161,27 @@ Changelog
 - **2023-06-20**
     - Added check for Webex third-party service subdomain.
 
-- **2023-03-28:**
+- **2023-03-28**
     - Added ability to optionally specify a target DNS server.
     - Fixed a typo that was breaking "fs" subdomain detection.
     - Updated Slack detection to be via web instead of DNS.
     - Updated third party DNS check to better account for multiple IP addresses returned for a subdomain.
     - Added web-based detection of Atlassian (Jira/Confluence/Trello).
 
-- **2023-01-17:** Added new user registration URL for Zix Secure Message Center.
+- **2023-01-17** 
+    - Added new user registration URL for Zix Secure Message Center.
 
-- **2023-01-10:** Added additional URLs and guidance for on-prem Microsoft services.
+- **2023-01-10** 
+    - Added additional URLs and guidance for on-prem Microsoft services.
 
-- **2022-12-05:** Added checks for third-party services:
-    - Okta
-    - ServiceNow
-    - Salesforce
-    - Slack
-    - Zoom (vanity URL)
-    - Ivanti
+- **2022-12-05**
+    - Added checks for third-party services:
+        - Okta
+        - ServiceNow
+        - Salesforce
+        - Slack
+        - Zoom (vanity URL)
+        - Ivanti
 
-- **2022-11-04:** Initial internal (BHIS) release.
+- **2022-11-04**
+    - Initial internal (BHIS) release.

@@ -241,7 +241,8 @@ def different_records(fqdn1, fqdn2):
     return ( fqdn1_record != fqdn2_record )
 
 
-def check_thirdparty_by_dns_comparison(fqdn_template, info_list, orgname=orgname):
+def check_thirdparty_by_dns_comparison(fqdn_template, info_list, 
+                                       orgname=orgname, target=target):
     """
     Check if the value of the target DNS record matches the value of a randomly
     generated DNS record. If it does not match, display the lines in info_list.
@@ -255,8 +256,8 @@ def check_thirdparty_by_dns_comparison(fqdn_template, info_list, orgname=orgname
         info_sublist = None
 
     random_value = 'UNLIKELY-' + randomword(8)
-    target_fqdn = fqdn_template.replace('{orgname}', orgname)
-    random_fqdn = fqdn_template.replace('{orgname}', random_value)
+    target_fqdn = fqdn_template.replace('{orgname}', orgname).replace('{target}', target)
+    random_fqdn = fqdn_template.replace('{orgname}', random_value).replace('{target}', random_value)
     if different_records(target_fqdn, random_fqdn):
         print(f'[+] {target_fqdn} - {service_name} likely in use!')
         if info_sublist:
@@ -289,7 +290,8 @@ def different_http_length(url1, url2):
     return ( len1 != len2 )
 
 
-def check_thirdparty_by_http_length(url_template, info_list, orgname=orgname):
+def check_thirdparty_by_http_length(url_template, info_list, orgname=orgname, 
+                                    target=target):
     """
     Check if the length of the data retrieved from the target URL matches the
     length of the data from a URL containing a randomly generated value. If the
@@ -302,9 +304,10 @@ def check_thirdparty_by_http_length(url_template, info_list, orgname=orgname):
     else:
         info_sublist = None
 
-    random_value = 'UNLIKELY-' + randomword(8)
-    target_url = url_template.replace('{orgname}', orgname)
-    random_url = url_template.replace('{orgname}', random_value)
+    random_orgname = randomword(len(orgname))
+    random_target = randomword(len(target))
+    target_url = url_template.replace('{orgname}', orgname).replace('{target}', target)
+    random_url = url_template.replace('{orgname}', random_orgname).replace('{target}',random_target)
     if different_http_length(target_url, random_url):
         print(f'[+] {target_url} - {service_name} likely in use!')
         if info_sublist:
@@ -335,7 +338,8 @@ def different_http_status(url1, url2, follow_redirects=False):
     return (response1.status_code != response2.status_code)
 
 
-def check_thirdparty_by_http_status(url_template, info_list, orgname=orgname):
+def check_thirdparty_by_http_status(url_template, info_list, orgname=orgname,
+                                    target=target):
     """
     Check if the HTTP status code retrieved from the target URL matches the
     status code returned from a URL containing a randomly generated value. If
@@ -348,9 +352,10 @@ def check_thirdparty_by_http_status(url_template, info_list, orgname=orgname):
     else:
         info_sublist = None
 
-    random_value = 'UNLIKELY-' + randomword(8)
-    target_url = url_template.replace('{orgname}', orgname)
-    random_url = url_template.replace('{orgname}', random_value)
+    random_orgname = randomword(len(orgname))
+    random_target = randomword(len(target))
+    target_url = url_template.replace('{orgname}', orgname).replace('{target}', target)
+    random_url = url_template.replace('{orgname}', random_orgname).replace('{target}', random_target)
     if different_http_status(target_url, random_url):
         print(f'[+] {target_url} - {service_name} likely in use!')
         if info_sublist:
@@ -473,6 +478,11 @@ securemail_info = [ 'Possible Secure Mail app. Try:',
                     '- https://{fqdn}/s/preregister  (Zix Secure Message Center user registration)'
                   ]
 
+
+mfa_portal_info = [ 'Possible Azure Multi-Factor Authentication Server. Try:',
+                    '- https://{fqdn}/MultiFactorAuth/',
+                  ]
+
 subdomain_targets = {
     'securemail.{target}': securemail_info,
     'adfs.{target}': adfs_info,
@@ -496,7 +506,6 @@ subdomain_targets = {
     'helpdesk.{target}': [],
     'help.{target}': [],
     'support.{target}': [],
-    'mfa.{target}': [],
     'hr.{target}': [],
     'humanresources.{target}': [],
     'directory.{target}': [],
@@ -505,6 +514,9 @@ subdomain_targets = {
     'okta.{target}': ['Possible Okta portal.'],
     'signin.{target}': [],
     'signon.{target}': [],
+    'mfa.{target}': mfa_portal_info,
+    'mfaportal.{target}': mfa_portal_info,
+    'azuremfa.{target}': mfa_portal_info,
     }
 
 print_heading("Checking for interesting subdomains...")
@@ -547,11 +559,19 @@ for fqdn_template in thirdparty_by_dns_comparison.keys():
     check_thirdparty_by_dns_comparison(fqdn_template, info_list)
 
 
+
+workday_info_list = [ 'Workday' ]
+
 thirdparty_by_http_length_comparison = {
     'https://{orgname}.slack.com': ["Slack"],
     'https://{orgname}.atlassian.net': ['Atlassian (Jira/Confluence/Trello)',
                                          '- {url}/login.jsp'],
-    'https://{orgname}.account.box.com': ['Box.com', '- {url}/login']
+    'https://{orgname}.account.box.com': ['Box.com', '- {url}/login'],
+    'https://{orgname}.corporateperks.com': ['Perks at Work'],
+    'https://discord.com/invite/{orgname}': ['Discord'],
+    # 'https://outlook.office365.com/owa/{target}': ['Outlook Web Access', '* Investigate: This sometimes redirects to on-premises services'],
+    'https://wd3.myworkday.com/{orgname}/d/home.htmld': workday_info_list,
+    'https://wd5.myworkday.com/{orgname}/d/home.htmld': workday_info_list,
     }
 
 for url_template in thirdparty_by_http_length_comparison.keys():
@@ -561,6 +581,7 @@ for url_template in thirdparty_by_http_length_comparison.keys():
 
 thirdparty_by_http_status_comparison = {
     'https://portal.globalview.adp.com/{orgname}': ["ADP Payroll"],
+    'https://github.com/{orgname}': ["GitHub"],
     }
 
 for url_template in thirdparty_by_http_status_comparison.keys():
