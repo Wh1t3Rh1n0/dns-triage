@@ -546,6 +546,7 @@ thirdparty_by_dns_comparison = {
     '{orgname}.zoom.us': zoom_info_list,
     '{orgname}.zoom.com': zoom_info_list,
     '{orgname}.saasit.com': ['Ivanti'],
+    '{orgname}.login.duosecurity.com': ['Duo'],
     '{orgname}.webex.com': ['Webex',
                             '- Try browsing to this subdomain, and look in Web UI for calendar/meetings.',
                             '- Try Google-dorking this domain to find links to meetings.'],

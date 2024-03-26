@@ -123,6 +123,9 @@ See also
 Changelog
 ---------
 
+- **2024-03-26**
+    - Added Duo.
+
 - **2024-03-10**
 	- Fixed old bash reference in README.md.
 	- Updated random string generation to match length of target and orgname strings.
