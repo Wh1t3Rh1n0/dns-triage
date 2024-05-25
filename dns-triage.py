@@ -488,6 +488,7 @@ subdomain_targets = {
     'adfs.{target}': adfs_info,
     'fs.{target}': adfs_info,
     'mail.{target}': ["Possible web mail. Try:"] + exchange_urls,
+    'email.{target}': ["Possible web mail. Try:"] + exchange_urls,
     'webmail.{target}': ["Possible web mail. Try:"] + exchange_urls,
     'vpn.{target}': vpn_info,
     'remote.{target}': vpn_info,
