@@ -1,3 +1,5 @@
+![dns-triage logo](assets/logo-dns-triage.png)
+
 dns-triage.py
 =============
 
