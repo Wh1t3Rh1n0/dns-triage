@@ -483,6 +483,15 @@ mfa_portal_info = [ 'Possible Azure Multi-Factor Authentication Server. Try:',
                     '- https://{fqdn}/MultiFactorAuth/',
                   ]
 
+
+mobileiron_info = [ 'Possible MobileIron - Sometimes configured for Single-Factor Auth! Try:',
+                    'https://{fqdn}/mifs/user/login.jsp',
+                  ]
+
+
+# Subdomains of target domain.
+# - Only checks if DNS records (CNAME/A/AAAA) for these exist.
+
 subdomain_targets = {
     'securemail.{target}': securemail_info,
     'adfs.{target}': adfs_info,
@@ -502,6 +511,7 @@ subdomain_targets = {
     'vdi.{target}': vpn_info,
     'xen.{target}': vpn_info,
     'mobile.{target}': [],
+    'mdm.{target}': [],
     'sharepoint.{target}': [],
     'intranet.{target}': [],
     'helpdesk.{target}': [],
@@ -518,6 +528,9 @@ subdomain_targets = {
     'mfa.{target}': mfa_portal_info,
     'mfaportal.{target}': mfa_portal_info,
     'azuremfa.{target}': mfa_portal_info,
+    'mi.{target}': mobileiron_info,
+    'mi1.{target}': mobileiron_info,
+    'mobileiron.{target}': mobileiron_info,
     }
 
 print_heading("Checking for interesting subdomains...")
@@ -539,6 +552,10 @@ zoom_info_list = [ 'Zoom',
                    '- Try Google-dorking this domain to find links to meetings.',
                  ]
 
+
+# Target as subdomain of third-party domain.
+# - Checks if DNS resolves to a different record than a random subdomain.
+
 thirdparty_by_dns_comparison = {
     '{orgname}.okta.com': ["Okta"],
     '{orgname}.service-now.com': ["ServiceNow"],
@@ -551,6 +568,7 @@ thirdparty_by_dns_comparison = {
     '{orgname}.webex.com': ['Webex',
                             '- Try browsing to this subdomain, and look in Web UI for calendar/meetings.',
                             '- Try Google-dorking this domain to find links to meetings.'],
+    '{orgname}.mobileiron.com': ['MobileIron'],
 }
 
 print_heading(f'Checking third-party services of "{orgname}"...', True, '=',

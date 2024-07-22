@@ -125,6 +125,9 @@ See also
 Changelog
 ---------
 
+- **2024-07-22**
+	- Added MobileIron.
+
 - **2024-03-26**
     - Added Duo.
 
