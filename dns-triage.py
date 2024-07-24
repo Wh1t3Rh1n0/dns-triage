@@ -569,6 +569,7 @@ thirdparty_by_dns_comparison = {
                             '- Try browsing to this subdomain, and look in Web UI for calendar/meetings.',
                             '- Try Google-dorking this domain to find links to meetings.'],
     '{orgname}.mobileiron.com': ['MobileIron'],
+    '{orgname}.jamfcloud.com': ['Jamf Apple Device Management'],
 }
 
 print_heading(f'Checking third-party services of "{orgname}"...', True, '=',
@@ -579,6 +580,10 @@ for fqdn_template in thirdparty_by_dns_comparison.keys():
     check_thirdparty_by_dns_comparison(fqdn_template, info_list)
 
 
+
+
+# Target as subdomain of third-party domain.
+# - Checks if HTTP response is different than for a random subdomain.
 
 workday_info_list = [ 'Workday' ]
 
