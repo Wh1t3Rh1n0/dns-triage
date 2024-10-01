@@ -509,6 +509,8 @@ subdomain_targets = {
     'remoteaccess.{target}': vpn_info,
     'citrix.{target}': vpn_info,
     'vdi.{target}': vpn_info,
+    'view.{target}': vpn_info,
+    'horizon.{target}': vpn_info,
     'xen.{target}': vpn_info,
     'mobile.{target}': [],
     'mdm.{target}': [],
@@ -597,6 +599,7 @@ thirdparty_by_http_length_comparison = {
     # 'https://outlook.office365.com/owa/{target}': ['Outlook Web Access', '* Investigate: This sometimes redirects to on-premises services'],
     'https://wd3.myworkday.com/{orgname}/d/home.htmld': workday_info_list,
     'https://wd5.myworkday.com/{orgname}/d/home.htmld': workday_info_list,
+    'https://{orgname}.myfreshworks.com/': ['FreshWorks'],
     }
 
 for url_template in thirdparty_by_http_length_comparison.keys():

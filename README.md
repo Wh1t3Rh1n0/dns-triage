@@ -125,6 +125,13 @@ See also
 Changelog
 ---------
 
+- **2024-10-01**
+    - Added `horizon` to the list of interesting subdomains. Possible VMware Horizon.
+    - Added FreshWorks.
+
+- **2024-09-07**
+	- Added `view` to the list of interesting subdomains.
+
 - **2024-07-24**
 	- Added Jamf.
 
