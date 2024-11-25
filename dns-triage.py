@@ -488,6 +488,8 @@ mobileiron_info = [ 'Possible MobileIron - Sometimes configured for Single-Facto
                     'https://{fqdn}/mifs/user/login.jsp',
                   ]
 
+investor_info = [ 'Likely investor portal.' ]
+
 
 # Subdomains of target domain.
 # - Only checks if DNS records (CNAME/A/AAAA) for these exist.
@@ -533,6 +535,9 @@ subdomain_targets = {
     'mi.{target}': mobileiron_info,
     'mi1.{target}': mobileiron_info,
     'mobileiron.{target}': mobileiron_info,
+    'ir.{target}': investor_info,
+    'investor.{target}': investor_info,
+    'investors.{target}': investor_info,
     }
 
 print_heading("Checking for interesting subdomains...")

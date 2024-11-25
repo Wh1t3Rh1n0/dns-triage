@@ -125,6 +125,10 @@ See also
 Changelog
 ---------
 
+- **2024-11-25**
+    - Added common investor portals to list of interesting subdomains.
+    - Happy Thanksgiving! 🦃
+
 - **2024-10-01**
     - Added `horizon` to the list of interesting subdomains. Possible VMware Horizon.
     - Added FreshWorks.
