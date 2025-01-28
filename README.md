@@ -125,6 +125,9 @@ See also
 Changelog
 ---------
 
+- **2025-01-28**
+    - Added "Investor login" (www.secureaccountview.com) to third-party services.
+
 - **2024-11-25**
     - Added common investor portals to list of interesting subdomains.
     - Happy Thanksgiving! 🦃

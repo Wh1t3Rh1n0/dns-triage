@@ -605,6 +605,7 @@ thirdparty_by_http_length_comparison = {
     'https://wd3.myworkday.com/{orgname}/d/home.htmld': workday_info_list,
     'https://wd5.myworkday.com/{orgname}/d/home.htmld': workday_info_list,
     'https://{orgname}.myfreshworks.com/': ['FreshWorks'],
+    'https://www.secureaccountview.com/BFWeb/clients/{orgname}/index': ['Investor login'],
     }
 
 for url_template in thirdparty_by_http_length_comparison.keys():
