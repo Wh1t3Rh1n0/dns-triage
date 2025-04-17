@@ -564,6 +564,7 @@ zoom_info_list = [ 'Zoom',
 # - Checks if DNS resolves to a different record than a random subdomain.
 
 thirdparty_by_dns_comparison = {
+    '{orgname}.awsapps.com': ["Amazon AWS Apps", f'- Possible AWS WorkDocs: htts://{orgname}.awsapps.com/', f'- Possible AWS Device Code authentication via: https://{orgname}.awsapps.com/start/', "    - More info: https://blog.christophetd.fr/phishing-for-aws-credentials-via-aws-sso-device-code-authentication/"],
     '{orgname}.okta.com': ["Okta"],
     '{orgname}.service-now.com': ["ServiceNow"],
     '{orgname}.salesforce.com': ['SalesForce'],

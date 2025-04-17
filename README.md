@@ -125,6 +125,9 @@ See also
 Changelog
 ---------
 
+- **2025-04-17**
+    - Added Amazon AWS Apps for WorkDocs and Device Code authentication detection.
+
 - **2025-01-28**
     - Added "Investor login" (www.secureaccountview.com) to third-party services.
 
