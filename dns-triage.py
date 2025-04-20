@@ -363,6 +363,15 @@ def check_thirdparty_by_http_status(url_template, info_list, orgname=orgname,
                 print('    ' + line.format(**{'url':target_url}))
         print()
 
+def check_axfr(domain, nameserver):
+    try:
+        zone = dns.zone.from_xfr(dns.query.xfr(nameserver, domain, lifetime=5))
+        for name in zone.nodes.keys():
+            print(zone[name].to_text(name))
+        print("\n[+] AXFR SUCCESS — Zone transfer is enabled and leaking records!")
+    except Exception as e:
+        print("[-] AXFR failed or not allowed.")
+
 
 # Parse additional command arguments.
 dns_resolver = re_search_list(r'([0-9]{1,3}\.){3}[0-9]{1,3}', sys.argv)
@@ -623,5 +632,20 @@ for url_template in thirdparty_by_http_status_comparison.keys():
     info_list = thirdparty_by_http_status_comparison[url_template]
     check_thirdparty_by_http_status(url_template, info_list)
 
+# ------------------------
+# AXFR Section
+# ------------------------
+
+print_heading(f"Checking for AXFR (zone transfer)...", True, '=', width=80, top_line=True)
+
+if dns_resolver:
+    check_axfr(target, dns_resolver)
+elif ns_records:
+    for ns in ns_records:
+        try:
+            ns_ip = resolve(ns)[0]
+            check_axfr(target, ns_ip)
+        except Exception as e:
+            print(f"[-] Failed to resolve NS '{ns}' or perform AXFR: {e}")
 print()
 print("DONE!")
